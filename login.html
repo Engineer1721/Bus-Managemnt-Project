@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Bus Portal - Login</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color:#1a2f55; /* Blue background */
+            background-size: 100% 100%;
+            position: relative;
+        }
+
+        .login-container {
+            background-color: rgba(255, 255, 255, 0.95);
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+            width: 90%;
+            max-width: 350px;
+            text-align: center;
+        }
+
+        select, input {
+            width: 100%;
+            padding: 10px;
+            margin: 12px 0;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        select:invalid {
+            color: gray;
+        }
+
+        .password-wrapper {
+            position: relative;
+        }
+
+        .password-wrapper input {
+            padding-right: 35px;
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+        }
+
+        button {
+            background-color: #1a2f55; /* Blue button */
+            color: white;
+            padding: 10px;
+            width: 100%;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background-color: #1a2f55; /* Darker blue on hover */
+        }
+
+        .logo-bottom-right {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            width: 160px; /* Further increased size */
+            height: auto; 
+            opacity: 0.8;
+        }
+
+        @media (max-width: 480px) {
+    .login-container {
+        padding: 30px 20px;
+    }
+    .logo-bottom-right {
+        width: 90px;
+    }
+}
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <form action="/login" method="POST">
+            <select id="role" name="role" required>
+                <option value="" disabled selected hidden>Role</option>
+                <option value="admin">Admin</option>
+                <option value="driver">Driver</option>
+                <option value="student">Student</option>
+            </select>
+
+            <input type="email" id="email" name="email" placeholder="Email" required>
+
+            <div class="password-wrapper">
+                <input type="password" id="password" name="password" placeholder="Password" required>
+                <span class="toggle-password" onclick="togglePassword()">👁️</span>
+            </div>
+
+            <button type="submit">🔐 Secure Login</button>
+        </form>
+    </div>
+
+    <!-- Logo in bottom right corner -->
+    <img src="{{ url_for('static', filename='LOGO3.png') }}" alt="Bus Portal Logo" class="logo-bottom-right">
+
+    <script>
+        function togglePassword() {
+            const passwordInput = document.getElementById('password');
+            passwordInput.type = passwordInput.type === 'password' ? 'text' : 'password';
+        }
+    </script>
+</body>
+</html>

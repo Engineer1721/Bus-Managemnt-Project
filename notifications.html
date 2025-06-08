@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Notifications</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #1a2f55;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        h1 {
+            text-align: center;
+            color:  #ffffff;
+        }
+
+        .container {
+            display: flex;
+            justify-content: space-between;
+            padding: 20px;
+            gap: 20px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .left-container, .right-container {
+            width: 48%;
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .left-container h3 {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+
+        .notification-form input,
+        .notification-form textarea,
+        .notification-form select {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            font-size: 16px;
+        }
+
+        .notification-form button {
+            background: #0056b3;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .notification-form button:hover {
+            background-color: #0056b3;
+        }
+
+        .notification-item {
+            background-color: #fff;
+            margin-bottom: 20px;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .notification-item h3 {
+            margin: 0;
+            font-size: 20px;
+            color: #0056b3;
+        }
+
+        .notification-item p {
+            font-size: 16px;
+            color: #555;
+        }
+
+        .notification-item em {
+            font-size: 14px;
+            color: #888;
+        }
+
+        .day-category {
+            margin: 10px 0;
+        }
+
+        .day-category label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+
+        .dashboard-btn {
+            background-color: #0056b3;
+            color: white;
+            padding: 12px 20px;
+            font-size: 18px;
+            text-align: center;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 3;
+        }
+
+        .dashboard-btn:hover {
+            background-color: #0056b3;
+        }
+
+        .popup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #4CAF50;
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+        }
+
+        .popup.show {
+            display: block;
+        }
+
+       
+        .watermark-logo {
+            position: fixed;
+            top: 55%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            opacity: 0.15;
+            z-index: 1000;
+            pointer-events: none;
+        }
+
+        .watermark-logo img {
+            width: 400px;
+            height: auto;
+        }
+        .btn-danger {
+    background-color: #0056b3;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.btn-danger:hover {
+    background-color: #004494;
+}
+.day-category input[type="checkbox"] {
+    width: 1em;   /* width equal to font size */
+    height: 1em;  /* height equal to font size */
+    vertical-align: middle; /* aligns checkbox vertically with text */
+    margin-right: 5px; /* small space between checkbox and label */
+}
+
+
+    </style>
+</head>
+<body>
+      <div class="watermark-logo">
+  <img src="{{ url_for('static', filename='LOGO3.png') }}" alt="Watermark Logo">
+</div>
+
+    <div class="container">
+        <!-- Left Container (Add Notification) -->
+        <div class="left-container">
+            <h3>Add a New Notification</h3>
+            <form method="POST" class="notification-form">
+                <label for="message">Message</label>
+                <textarea id="message" name="message" required></textarea>
+
+                <label for="role">Role</label>
+                <select id="role" name="role" required>
+                    <option value="admin">Admin</option>
+                    <option value="student">Student</option>
+                    <option value="driver">Driver</option>
+                    <option value="all">All</option>
+                </select>
+
+                <label>Select Days</label>
+                <div class="day-category">
+                    <label><input type="checkbox" name="days" value="Monday"> Monday</label>
+                    <label><input type="checkbox" name="days" value="Tuesday"> Tuesday</label>
+                    <label><input type="checkbox" name="days" value="Wednesday"> Wednesday</label>
+                    <label><input type="checkbox" name="days" value="Thursday"> Thursday</label>
+                    <label><input type="checkbox" name="days" value="Friday"> Friday</label>
+                    <label><input type="checkbox" name="days" value="Saturday"> Saturday</label>
+                    <label><input type="checkbox" name="days" value="Sunday"> Sunday</label>
+                </div>
+
+                <button type="submit">Add Notification</button>
+            </form>
+        </div>
+        <div class="right-container">
+            <h1>Notifications</h1>
+            {% if notifications %}
+                {% for notification in notifications %}
+                    <div class="notification-item">
+                        <h3>{{ notification['role'] }}</h3>
+                        <p>{{ notification['message'] }}</p>
+                        {% if notification['days'] %}
+                            <p><strong>Days:</strong> {{ notification['days'] }}</p>
+                        {% endif %}
+                        <em>Created at: {{ notification['created_at'] }}</em>
+                        <form method="POST" action="{{ url_for('delete_notification', id=notification['id']) }}" style="display:inline;">
+                            <button type="submit" onclick="return confirm('Are you sure you want to delete this notification?');" class="btn btn-danger">Delete</button>
+                        </form>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p>No notifications found.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="popup show">
+                {{ messages[0][1] }}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <a href="/dashboard" class="dashboard-btn">Go to Dashboard</a>
+
+    <script>
+        setTimeout(function() {
+            document.querySelector('.popup')?.classList.remove('show');
+        }, 3000);  // Pop-up will disappear after 3 seconds
+    </script>
+
+</body>
+</html>

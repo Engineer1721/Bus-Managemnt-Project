@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>QR Code Dashboard</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background-color: #1a2f55;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: #ffffff;
+        }
+
+        .dashboard-container {
+            background-color: #ffffff;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+        }
+
+        h2 {
+            color: #1a2f55;
+            margin-bottom: 30px;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        button {
+            background-color: #0056b3;
+            color: #fff;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background-color: #004494;
+        }
+
+        a {
+            display: inline-block;
+            margin-top: 25px;
+            text-decoration: none;
+            color: #0056b3;
+            font-weight: bold;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+          .logo img {
+            height: 60px;
+        }
+          .watermark-logo {
+            position: fixed;
+            top: 55%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            opacity: 0.15;
+            z-index: 1000;
+            pointer-events: none;
+        }
+
+        .watermark-logo img {
+            width: 400px;
+            height: auto;
+        }
+    </style>
+</head>
+<body>
+     <div class="header">
+        <div class="watermark-logo">
+  <img src="{{ url_for('static', filename='LOGO3.png') }}" alt="Watermark Logo">
+</div>
+    <div class="dashboard-container">
+        <h2>Generate QR Code for Registration Number</h2>
+        <form method="POST" action="{{ url_for('generate_qr') }}">
+            <input type="text" name="registration_number" placeholder="Enter registration number" required>
+            <button type="submit">Generate QR Code</button>
+        </form>
+
+        <hr style="margin: 30px 0; border-color: #ccc;">
+
+        <a href="{{ url_for('scan_registration') }}">Go to QR Code Scanner</a>
+    </div>
+</body>
+</html>

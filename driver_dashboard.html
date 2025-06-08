@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Driver Dashboard</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #1a2f55;
+      color: #333;
+      overflow: hidden;
+    }
+
+    nav.sidebar {
+      width: 260px;
+      background-color: #2c3e70;
+      color: #f5f5f5;
+      height: 100vh;
+      position: fixed;
+      top: 0;
+      left: 0;
+      display: flex;
+      flex-direction: column;
+      padding-top: 0.5rem;
+      box-shadow: 2px 0 8px rgba(0,0,0,0.3);
+      z-index: 10;
+    }
+
+    nav.sidebar h2 {
+      text-align: center;
+      margin-bottom: 2.5rem;
+      font-weight: 600;
+      font-size: 2.2rem;
+      letter-spacing: 1px;
+      border-bottom: 1px solid #5a6066;
+      padding-bottom: 1.2rem;
+      user-select: none;
+    }
+
+    nav.sidebar a {
+      color: #f5f5f5;
+      text-decoration: none;
+      padding: 1.3rem 2.4rem;
+      display: block;
+      font-weight: 600;
+      font-size: 1.15rem;
+      border-left: 4px solid transparent;
+      transition: background-color 0.3s ease, border-color 0.3s ease;
+    }
+
+    nav.sidebar a:hover,
+    nav.sidebar a.active {
+      background-color: #6c757d;
+      border-left-color: #adb5bd;
+      color: #fff;
+    }
+  .top-left-driver-image {
+  margin-top: -2rem;  /* Pull it closer to the top if needed */
+  margin-bottom: 1rem;
+  padding-left: 1rem;
+  overflow: visible; 
+}
+
+
+.top-left-driver-image img {
+  width: 80%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+  box-shadow: 0 0 8px rgba(0,0,0,0.3);
+}
+
+
+    .main-content {
+      position: absolute;
+      top: 0;
+      left: 260px;
+      right: 0;
+      bottom: 0;
+      background-color: #fff;
+      padding: 3rem 4rem;
+      overflow-y: auto;
+    }
+
+    header {
+      background: #2c3e70;
+      color: white;
+      padding: 1.8rem 2.5rem;
+      border-radius: 8px 8px 0 0;
+      margin-bottom: 2.5rem;
+      box-shadow: 0 4px 8px rgba(26, 47, 85, 0.8);
+      user-select: none;
+    }
+
+    header h1 {
+      margin: 0 0 0.5rem 0;
+      font-weight: 700;
+      font-size: 2.4rem;
+      letter-spacing: 0.05em;
+    }
+
+    header p {
+      margin: 0;
+      font-size: 1.3rem;
+      font-weight: 600;
+      color: #ced4da;
+    }
+
+    a.logout,
+    button,
+    input[type="submit"],
+    input[type="button"],
+    input[type="reset"],
+    .btn {
+      background: #1a2f55;
+      color: #fff;
+      font-weight: 700;
+      border: none;
+      padding: 0.65rem 1.3rem;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 1.1rem;
+      text-align: center;
+      text-decoration: none;
+      transition: background-color 0.3s ease, color 0.3s ease;
+      display: inline-block;
+      user-select: none;
+    }
+
+    a.logout:hover,
+    button:hover,
+    input[type="submit"]:hover,
+    input[type="button"]:hover,
+    input[type="reset"]:hover,
+    .btn:hover {
+      background: #15375a;
+      color: #e9ecef;
+    }
+
+    h2 {
+      color: #2c3e70;
+      border-bottom: 3px solid #1a2f55;
+      padding-bottom: 0.7rem;
+      margin-bottom: 2rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      font-size: 1.8rem;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 2.5rem;
+      font-size: 1.2rem;
+      box-shadow: 0 2px 15px rgba(0,0,0,0.08);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    th, td {
+      padding: 1.3rem 2rem;
+      border-bottom: 1px solid #ddd;
+      text-align: left;
+      vertical-align: middle;
+    }
+
+    th {
+      background: #1a2f55;
+      color: #fff;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+    }
+
+    tr:nth-child(even) {
+      background: #f4f5f7;
+    }
+
+    tr:hover {
+      background-color: #e9ecef;
+    }
+
+    p.empty-msg {
+      font-style: italic;
+      color: #666;
+      padding: 1.2rem 0;
+      user-select: none;
+      font-size: 1.1rem;
+    }
+
+    ul.notifications {
+      list-style: none;
+      padding-left: 0;
+      margin-bottom: 3.5rem;
+    }
+
+    ul.notifications li {
+      background: #e9ecef;
+      margin-bottom: 1.3rem;
+      padding: 1.2rem 1.5rem;
+      border-left: 6px solid #1a2f55;
+      border-radius: 5px;
+      box-shadow: 0 1px 5px rgba(26, 47, 85, 0.1);
+      user-select: none;
+      font-size: 1.1rem;
+    }
+
+    ul.notifications li:hover {
+      background-color: #dee2e6;
+    }
+
+    ul.notifications li time {
+      font-size: 0.9rem;
+      color: #495057;
+      font-weight: 600;
+      display: inline-block;
+      margin-bottom: 0.4rem;
+    }
+
+    ul.notifications li span.days {
+      font-style: italic;
+      color: #1a2f55;
+      font-weight: 400;
+      margin-left: 0.7rem;
+    }
+
+    form {
+      max-width: 600px;
+      background: #f9fafb;
+      padding: 2rem 2.5rem;
+      border-radius: 10px;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+      margin-bottom: 3rem;
+    }
+
+    form label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 0.7rem;
+      color: #2c3e70;
+      font-size: 1.1rem;
+    }
+
+    form input[type="text"],
+    form input[type="email"],
+    form input[type="password"],
+    form select,
+    form textarea {
+      width: 100%;
+      padding: 0.85rem 1.2rem;
+      font-size: 1.1rem;
+      border: 1.8px solid #ced4da;
+      border-radius: 8px;
+      margin-bottom: 1.6rem;
+    }
+
+    form input[type="text"]:focus,
+    form input[type="email"]:focus,
+    form input[type="password"]:focus,
+    form select:focus,
+    form textarea:focus {
+      outline: none;
+      border-color: #1a2f55;
+      box-shadow: 0 0 5px rgba(26, 47, 85, 0.4);
+    }
+
+    .watermark-logo {
+      position: fixed;
+      top: 55%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      opacity: 0.15;
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    .watermark-logo img {
+      width: 400px;
+      height: auto;
+    }
+  </style>
+</head>
+<body>
+  <nav class="sidebar">
+   <div class="top-left-driver-image">
+  <img src="{{ url_for('static', filename='driver.png') }}" alt="Driver Icon" />
+</div>
+  <h2 class="sidebar-title">Driver Dashboard</h2>
+  <a href="{{ url_for('driver_dashboard') }}" class="active">Dashboard</a>
+  <a href="{{ url_for('scan_registration') }}">Scan Registration</a>
+
+<a href="{{ url_for('logout') }}" class="logout">Logout</a>
+
+</nav>
+
+  <div class="watermark-logo">
+    <img src="{{ url_for('static', filename='LOGO3.png') }}" alt="Watermark Logo">
+  </div>
+
+  <div class="main-content">
+  <header>
+  <h1>Welcome, {{ driver_info.name|default(user.name) }}</h1>
+  <p>Reg. No: {{ driver_info.registration_number|default("N/A") }}</p>
+</header>
+
+
+    <!-- Driver Info -->
+    <section>
+      <h2>Your Information</h2>
+      {% if driver_info %}
+      <table>
+        <tr><th>Registration Number</th><td>{{ driver_info.registration_number }}</td></tr>
+        <tr><th>Name</th><td>{{ driver_info.name }}</td></tr>
+        <tr><th>Email</th><td>{{ driver_info.email }}</td></tr>
+        <tr><th>Working Days</th><td>{{ driver_info.working_days }}</td></tr>
+        <tr><th>Shift</th><td>{{ driver_info.shift }}</td></tr>
+        <tr><th>Status</th><td>{{ driver_info.is_active }}</td></tr>
+      </table>
+      {% else %}
+      <p class="empty-msg">Driver information not found.</p>
+      {% endif %}
+    </section>
+
+    <!-- Bus Info -->
+    <section>
+      <h2>Bus Information</h2>
+      {% if bus_info.number %}
+      <table>
+        <tr><th>Bus Number</th><td>{{ bus_info.number }}</td></tr>
+        <tr><th>Capacity</th><td>{{ bus_info.capacity }}</td></tr>
+      </table>
+      {% else %}
+      <p class="empty-msg">No bus assigned yet.</p>
+      {% endif %}
+    </section>
+
+    <!-- Route Info -->
+    <section>
+      <h2>Route Information</h2>
+      {% if route_info.start %}
+      <table>
+        <tr><th>Start</th><td>{{ route_info.start }}</td></tr>
+        <tr><th>End</th><td>{{ route_info.end }}</td></tr>
+        <tr><th>Fare</th><td>{{ route_info.fare }}</td></tr>
+        <tr><th>Stops</th><td>{{ route_info.stops }}</td></tr>
+        <tr>
+          <th>Map</th>
+          <td>
+            {% if route_info.map %}
+              <a href="{{ route_info.map }}" target="_blank" rel="noopener noreferrer">View Map</a>
+            {% else %}
+              N/A
+            {% endif %}
+          </td>
+        </tr>
+      </table>
+      {% else %}
+      <p class="empty-msg">No route assigned yet.</p>
+      {% endif %}
+    </section>
+
+    <!-- Notifications -->
+    <section>
+      <h2>Notifications</h2>
+      {% if notifications %}
+      <ul class="notifications">
+        {% for note in notifications %}
+        <li>
+          <time>{{ note.created_at }}</time>
+          <span class="days">({{ note.days }})</span>
+          <div>{{ note.message }}</div>
+        </li>
+        {% endfor %}
+      </ul>
+      {% else %}
+      <p class="empty-msg">No notifications.</p>
+      {% endif %}
+    </section>
+  </div>
+</body>
+</html>

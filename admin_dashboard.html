@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    
+    <!-- Bootstrap & Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Poppins', sans-serif;
+            min-height: 100vh;
+            background-color: #1a2f55;
+            overflow-y: auto; /* Make scrollable */
+        }
+
+        .dashboard-wrapper {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 220px;
+            background-color: #1a2f55;
+            color: white;
+            padding: 40px 0 20px 0;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .sidebar h3 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .sidebar a {
+            display: block;
+            color: white;
+            padding: 16px 22px;
+            text-decoration: none;
+            margin: 15px 15px;
+            font-size: 18px;
+            border: 2px solid white;
+            border-radius: 10px;
+            background-color: transparent;
+            transition: background-color 0.3s ease;
+        }
+
+        .sidebar a:hover {
+            background-color: #555;
+        }
+
+        .main-content {
+            flex-grow: 1;
+            padding: 20px;
+            background-color: #1a2f55;
+        }
+
+        .form-container {
+            background-color: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-container input,
+        .form-container select {
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h2 style="text-align: center; color: white; margin-top: 20px; font-family: 'Georgia', serif; font-weight: bold;">
+        NTU Transport Management System
+    </h2>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <div class="dashboard-wrapper">
+
+        <!-- Sidebar -->
+  <div class="sidebar">
+    <h3><i class="fas fa-user-cog" style="color: grey;"></i> Admin Panel</h3>
+    <a href="/add-route"><i class="fas fa-route" style="color: grey;"></i> Add Routes</a>
+    <a href="{{ url_for('add_driver') }}"><i class="fas fa-id-badge" style="color: grey;"></i> Add Driver</a>
+    <a href="{{ url_for('add_bus') }}"><i class="fas fa-bus" style="color: grey;"></i> Add Buses</a>
+    <a href="{{ url_for('add_student') }}"><i class="fas fa-user-graduate" style="color: grey;"></i> Add Students</a>
+    <a href="/notifications"><i class="fas fa-bullhorn" style="color: grey;"></i> Send Notification</a>
+    <a href="{{ url_for('qr_form') }}"><i class="fas fa-qrcode" style="color: grey;"></i> Generate QR</a>
+    <a href="{{ url_for('scan_registration') }}"><i class="fas fa-camera" style="color: grey;"></i> Scan Registration</a>
+    <a href="{{ url_for('print_database') }}"><i class="fas fa-print" style="color: grey;"></i> Print Database</a>
+    <a href="/logout"><i class="fas fa-sign-out-alt" style="color: grey;"></i> Logout</a>
+</div>
+
+
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="container">
+
+                <h2 class="mb-3 text-white" style="font-weight: 600; font-size: 25px; margin-top: 20px;">ADMIN DASHBOARD</h2>
+
+                <!-- Flash messages -->
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                  {% if messages %}
+                    {% for category, message in messages %}
+                      <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                      </div>
+                    {% endfor %}
+                  {% endif %}
+                {% endwith %}
+
+                <!-- Dashboard Statistics -->
+                <div class="row mb-4">
+                    <div class="col-md-2">
+                        <div class="card text-center" style="position: relative; z-index: 2; background-color: white;">
+                            <div class="card-header bg-secondary text-white">Buses</div>
+                            <div class="card-body">
+                                <h4>{{ total_buses }}</h4>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-2">
+                        <div class="card text-center" style="position: relative; z-index: 2; background-color: white;">
+                            <div class="card-header bg-secondary text-white">Students</div>
+                            <div class="card-body">
+                                <h4>{{ total_students }}</h4>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-2">
+                        <div class="card text-center" style="position: relative; z-index: 2; background-color: white;">
+                            <div class="card-header bg-secondary text-white">Drivers</div>
+                            <div class="card-body">
+                                <h4>{{ total_drivers }}</h4>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3">
+                        <div class="card text-center" style="position: relative; z-index: 2; background-color: white;">
+                            <div class="card-header bg-secondary text-white">Active Routes</div>
+                            <div class="card-body">
+                                <h4>{{ active_routes }}</h4>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3">
+                        <div class="card text-center" style="position: relative; z-index: 2; background-color: white;">
+                            <div class="card-header bg-secondary text-white">Available Seats</div>
+                            <div class="card-body">
+                                <h4>{{ seat_availability }}</h4>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dummy content for scroll testing -->
+                <!-- <p style="color: white;">{{ 'Scroll me! ' * 100 }}</p> -->
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Watermark Logo -->
+    <div style="
+        position: fixed;
+        top: 65%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        opacity: 0.25;
+        z-index: 0;
+        pointer-events: none;
+    ">
+        <img src="{{ url_for('static', filename='LOGO3.png') }}" alt="Watermark Logo" style="width: 400px; height: auto;">
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin - Manage Students</title>
+  <style>
+   body {
+  font-family: Arial, sans-serif;
+  background: #1a2f55;
+  padding: 20px;
+  margin: 0;
+  display: flex;
+  justify-content: center;  /* horizontal center */
+  align-items: center;      /* vertical center */
+  min-height: 100vh;
+}
+    .container {
+  max-width: 800px;
+  width: 100%; /* full width up to max-width */
+  margin: 0 auto; /* center horizontally */
+}
+
+    h2 {
+      text-align: center;
+      color: #fff;
+    }
+    .flash {
+      padding: 10px 15px;
+      margin-bottom: 20px;
+      border-radius: 4px;
+    }
+    .flash-success {
+      background-color: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+    .flash-danger {
+      background-color: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+    }
+form {
+  max-width: 600px; /* ya jitna chahiye */
+  margin: 20px auto; /* vertical space + horizontal centering */
+  background: #fff;
+  padding: 20px;
+  border-radius: 5px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+table {
+  max-width: 700px; /* ya jitna chahiye */
+  margin: 20px auto; /* center horizontally with some top margin */
+  border-collapse: collapse;
+  background: #fff;
+  width: 100%; /* full width of the max-width container */
+}
+th, td {
+  padding: 12px;
+  text-align: center; /* keep text aligned left */
+  border: 1px solid #ddd;
+}
+    input, select, button {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 15px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+    }
+    button {
+      background-color: #1a2f55;
+      color: white;
+      border: none;
+    }
+    button:hover {
+      background-color: #1a2f55;
+      cursor: pointer;
+    }
+    .action-buttons {
+      text-align: center;
+      margin-top: 20px;
+    }
+    .action-buttons button {
+      background-color: #007bff;
+      color: white;
+      margin: 0 10px;
+    }
+    .action-buttons button:hover {
+      background-color: #0056b3;
+    }
+    .search-bar {
+      display: flex;
+      margin-top: 30px;
+    }
+    .search-bar input {
+      flex: 1;
+      margin-right: 10px;
+    }
+    .search-bar button {
+      width: auto;
+    }
+    .search-bar a {
+      align-self: center;
+      margin-left: 10px;
+      text-decoration: none;
+      color: #007bff;
+    }
+    /* Buttons inside table (Edit, Delete) */
+.edit-btn, table form button {
+  padding: 6px 12px;
+  font-size: 0.9rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  min-width: 70px;
+}
+
+/* Edit button */
+.edit-btn {
+  background-color: #6c757d;
+  color: #212529;
+  margin: 0 5px;
+}
+
+.edit-btn:hover {
+  background-color: #6c757d;
+}
+
+/* Delete button */
+table form button {
+  background-color: #007bff;
+  color: white;
+  margin: 0 5px;
+}
+
+table form button:hover {
+  background-color: #c82333;
+}
+
+/* Make buttons inline */
+td > a, td > form {
+  display: inline-block;
+  margin: 0;
+  padding: 0;
+}
+
+/* Align text center in cells */
+th, td {
+  padding: 12px;
+  text-align: center;
+  border: 1px solid #ddd;
+}
+
+    .logo img {
+      height: 60px;
+    }
+    .watermark-logo {
+      position: fixed;
+      top: 55%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      opacity: 0.15;
+      z-index: 1000;
+      pointer-events: none;
+    }
+    .watermark-logo img {
+      width: 400px;
+      height: auto;
+    }
+
+    /* New smaller button for Dashboard */
+    .small-btn {
+      padding: 6px 12px;
+      font-size: 0.85rem;
+      background-color: #007bff;
+      border-radius: 4px;
+      border: none;
+      color: white;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      width: auto;
+      min-width: 100px;
+    }
+    .small-btn:hover {
+      background-color: #0056b3;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="watermark-logo">
+    <img src="{{ url_for('static', filename='LOGO3.png') }}" alt="Watermark Logo">
+  </div>
+
+  <div class="container">
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, msg in messages %}
+          <div class="flash flash-{{ category }}">{{ msg }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <!-- Student Form -->
+    <h2>{{ 'Edit Student ' + student_to_edit['registration_number'] if student_to_edit else 'Add New Student' }}</h2>
+    <form method="POST" action="{{ url_for('add_student') }}">
+      {% if student_to_edit %}
+        <input type="hidden" name="original_registration" value="{{ student_to_edit['registration_number'] }}">
+      {% endif %}
+
+      <label for="registration_number">Registration Number:</label>
+      <input type="text" name="registration_number" required value="{{ student_to_edit['registration_number'] if student_to_edit else '' }}">
+
+      <label for="name">Name:</label>
+      <input type="text" name="name" required value="{{ student_to_edit['name'] if student_to_edit else '' }}">
+
+      <label for="email">Email:</label>
+      <input type="email" name="email" required value="{{ student_to_edit['email'] if student_to_edit else '' }}">
+
+      <label for="password">Password:</label>
+      <input type="password" name="password" id="password" required value="{{ student_to_edit['password'] if student_to_edit else '' }}">
+      <div style="margin-bottom:15px;">
+        <input type="checkbox" id="show_password" onchange="togglePassword()">
+        <label for="show_password" style="margin-left:5px;">Show Password</label>
+      </div>
+
+      <label for="fee_status">Fee Status:</label>
+      <select name="fee_status" required>
+        <option value="Paid"   {% if student_to_edit and student_to_edit['fee_status'] == 'Paid' %}selected{% endif %}>Paid</option>
+        <option value="Unpaid" {% if student_to_edit and student_to_edit['fee_status'] == 'Unpaid' %}selected{% endif %}>Unpaid</option>
+      </select>
+
+      <label for="seat_number">Seat Number:</label>
+      <input type="text" name="seat_number" required value="{{ student_to_edit['seat_number'] if student_to_edit else '' }}">
+
+      <label for="route_code">Route Code:</label>
+      <select name="route_code" id="route_code" onchange="populateDrivers()" required>
+        <option value="">-- Select Route --</option>
+        {% for route in routes %}
+          <option value="{{ route['route_code'] }}" {% if student_to_edit and route['route_code'] == student_to_edit['route_code'] %}selected{% endif %}>
+            {{ route['route_code'] }} ({{ route['start'] }} to {{ route['end'] }})
+          </option>
+        {% endfor %}
+      </select>
+
+      <label for="driver_registration">Driver:</label>
+      <select id="driver" name="driver_registration" required>
+        <option value="">-- Select Driver --</option>
+        {% if student_to_edit %}
+          {% for drv in route_driver_map.get(student_to_edit['route_code'], []) %}
+            <option value="{{ drv['registration_number'] }}" {% if drv['registration_number'] == student_to_edit['driver_registration'] %}selected{% endif %}>
+              {{ drv['name'] }} ({{ drv['registration_number'] }})
+            </option>
+          {% endfor %}
+        {% endif %}
+      </select>
+
+      <button type="submit">{{ 'Update Student' if student_to_edit else 'Add Student' }}</button>
+    </form>
+
+    <!-- Search Bar -->
+    <form class="search-bar" method="GET" action="{{ url_for('add_student') }}">
+      <input type="text" name="q" placeholder="Search by name or registration #" value="{{ search_query }}">
+      <button type="submit">Search</button>
+      {% if search_query %}
+        <a href="{{ url_for('add_student') }}">Clear</a>
+      {% endif %}
+    </form>
+
+    <!-- Student List -->
+    <h2>Manage Students</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Registration Number</th>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Fee Status</th>
+          <th>Route Code</th>
+          <th>Bus ID</th>
+          <th>Edit</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for student in students %}
+        <tr>
+          <td>{{ student['registration_number'] }}</td>
+          <td>{{ student['name'] }}</td>
+          <td>{{ student['email'] }}</td>
+          <td>{{ student['fee_status'] }}</td>
+          <td>{{ student['route_code'] }}</td>
+          <td>{{ student['bus_id'] }}</td>
+          <td>
+            <a href="{{ url_for('add_student') }}?edit={{ student['registration_number'] }}">
+              <button type="button" class="edit-btn">Edit</button>
+            </a>
+          </td>
+          <td>
+            <form method="POST" action="{{ url_for('delete_student', registration_number=student['registration_number']) }}" onsubmit="return confirm('Are you sure you want to delete {{ student.name }}?');">
+              <button type="submit">Delete</button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <!-- Navigation Buttons -->
+    <div class="action-buttons">
+      <a href="{{ url_for('dashboard') }}"><button class="small-btn">Dashboard</button></a>
+      <!-- Removed extra Add Student button -->
+    </div>
+  </div>
+
+  <!-- Route-driver data JSON -->
+  <script type="application/json" id="route-driver-json">
+    {{ route_driver_map | tojson | safe }}
+  </script>
+
+  <script>
+    function populateDrivers() {
+      const routeCode = document.getElementById('route_code').value;
+      const driverSelect = document.getElementById('driver');
+      driverSelect.innerHTML = '<option value="">-- Select Driver --</option>';
+      const drivers = JSON.parse(document.getElementById('route-driver-json').textContent)[routeCode] || [];
+      drivers.forEach(driver => {
+        const opt = document.createElement('option');
+        opt.value = driver.registration_number;
+        opt.textContent = `${driver.name} (${driver.registration_number})`;
+        driverSelect.appendChild(opt);
+      });
+    }
+
+    function togglePassword() {
+      const pwdField = document.getElementById('password');
+      pwdField.type = pwdField.type === 'password' ? 'text' : 'password';
+    }
+  </script>
+
+</body>
+</html>

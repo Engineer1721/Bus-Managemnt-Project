@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Manage Routes</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background-color: #1a2f55;
+            color: #f8f9fa;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        h2 {
+            margin-top: 0;
+            color: #ffffff;
+        }
+
+        .dashboard-btn,
+        .cancel-btn,
+        button {
+            padding: 10px 15px;
+            background-color: #1a2f55;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            margin-right: 10px;
+            text-decoration: none;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        button:hover,
+        .dashboard-btn:hover,
+        .cancel-btn:hover {
+            background: #0056b3;
+        }
+
+       /* Container for buttons inside Actions cell */
+.actions-container {
+    display: flex;           /* arrange buttons horizontally */
+    gap: 10px;               /* space between buttons */
+    padding: 1px;            /* some padding around buttons */
+    justify-content: center; /* center align buttons */
+}
+
+/* Buttons styles */
+.delete-btn, .edit-btn {
+    background-color: #1a2f55;  /* blue */
+    color: white;
+    padding: 5px 10px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 15px;
+    flex: 1;               /* buttons take equal space */
+    box-sizing: border-box;
+    transition: background-color 0.3s ease;
+    outline: none;
+    box-shadow: none;
+}
+
+        .delete-btn:hover,
+        .edit-btn:hover {
+            background: #0056b3;
+        }
+
+        form {
+            background: #6c757d;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        }
+
+        .centered-form {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .form-group {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        label {
+            color: #f8f9fa;
+            font-weight: bold;
+            text-align: right;
+            padding-right: 10px;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 6px;
+            background-color: #f8f9fa;
+            color: #212529;
+            font-size: 16px;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 60px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background-color: #2c2f4a;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            font-size: 20px;
+        }
+
+        th, td {
+            padding: 12px 12px;
+            text-align: left;
+        }
+
+        th {
+            background: #5a6268; /* darker grey for header */
+            color: #ffffff;
+        }
+
+        td {
+            background: #6c757d;
+            color: #f1f1f1;
+        }
+
+        th:last-child {
+            text-align: center;
+        }
+
+        td:last-child {
+            text-align: center;
+        }
+        td form {
+    margin: 0;
+    padding: 0;
+}
+
+
+        a {
+            color: #1a2f55;
+        }
+
+        .flash-message {
+            background-color: #28a745;
+            color: white;
+            padding: 10px;
+            border-left: 5px solid #218838;
+            border-radius: 6px;
+            margin-bottom: 20px;
+        }
+
+        .watermark-logo {
+            position: fixed;
+            top: 55%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            opacity: 0.15;             /* Lower opacity for softer watermark look */
+    z-index: 1000;
+            pointer-events: none;
+        }
+
+        .watermark-logo img {
+            width: 400px;
+            height: auto;
+        }
+
+        .content-wrapper {
+            position: relative;
+            z-index: 2;
+        }
+
+        .submit-wrapper {
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Watermark Logo -->
+<div class="watermark-logo">
+    <img src="{{ url_for('static', filename='LOGO3.png') }}" alt="Watermark Logo">
+</div>
+
+<div class="content-wrapper">
+
+<h2>Admin - {% if route_to_edit %}Edit Route{% else %}Add New Route{% endif %}</h2>
+
+<!-- Dashboard and Cancel Buttons -->
+<div style="margin-bottom: 20px;">
+    <a href="{{ url_for('admin_dashboard') }}" class="dashboard-btn">Dashboard</a>
+    <a href="{{ url_for('add_route') }}" class="cancel-btn">Cancel Search</a>
+</div>
+
+<!-- Search Form -->
+<form method="GET" action="{{ url_for('add_route') }}">
+    <input type="text" name="search" placeholder="Search by route code, start, or end" value="{{ request.args.get('search', '') }}">
+    <button type="submit">Search</button>
+</form>
+
+<!-- Flash Message -->
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    {% for category, message in messages %}
+      <div class="flash-message">{{ message }}</div>
+    {% endfor %}
+  {% endif %}
+{% endwith %}
+
+<!-- Route Add/Edit Form -->
+<div class="centered-form">
+<form method="POST">
+    <div class="form-group">
+        <label>Route Code:</label>
+        <input type="text" name="route_code" value="{{ route_to_edit['route_code'] if route_to_edit else '' }}" {% if route_to_edit %}readonly{% endif %} required>
+    </div>
+
+    <div class="form-group">
+        <label>Start Location:</label>
+        <input type="text" name="start" value="{{ route_to_edit['start'] if route_to_edit else '' }}" required>
+    </div>
+
+    <div class="form-group">
+        <label>End Location:</label>
+        <input type="text" name="end" value="{{ route_to_edit['end'] if route_to_edit else '' }}" required>
+    </div>
+
+    <div class="form-group">
+        <label>Stops (comma-separated):</label>
+        <textarea name="stops">{{ route_to_edit['stops'] if route_to_edit else '' }}</textarea>
+    </div>
+
+    <div class="form-group">
+        <label>Fare (Rs):</label>
+        <input type="number" step="0.01" name="fare" value="{{ route_to_edit['fare'] if route_to_edit else '' }}" required>
+    </div>
+
+    <div class="form-group">
+        <label>Map Link:</label>
+        <input type="text" name="map" value="{{ route_to_edit['map'] if route_to_edit else '' }}">
+    </div>
+
+    <div class="submit-wrapper">
+        <button type="submit">Save</button>
+    </div>
+</form>
+</div>
+
+<!-- Routes Table -->
+<h2>All Routes</h2>
+<table>
+    <thead>
+        <tr>
+            <th>ROUTE CODE</th>
+            <th>START</th>
+            <th>END</th>
+            <th>STOPS</th>
+            <th>FARE</th>
+            <th>MAP</th>
+            <th>ACTIONS</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for route in routes %}
+        <tr>
+            <td>{{ route['route_code'] }}</td>
+            <td>{{ route['start'] }}</td>
+            <td>{{ route['end'] }}</td>
+            <td>{{ route['stops'] }}</td>
+            <td>{{ route['fare'] }}</td>
+            <td><a href="{{ route['map'] }}" target="_blank">View Map</a></td>
+            <td>
+                <!-- Edit Route -->
+                <form method="GET" action="{{ url_for('add_route') }}" style="display:inline;">
+                    <input type="hidden" name="route_code" value="{{ route['route_code'] }}">
+                    <button type="submit" class="edit-btn">Edit</button>
+                </form>
+
+                <!-- Delete Route -->
+                <form method="POST" action="{{ url_for('delete_route', route_code=route['route_code']) }}" style="display:inline;">
+                    <button type="submit" class="delete-btn" onclick="return confirm('Are you sure you want to delete this route?');">Delete</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Manage Drivers</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, sans-serif;
+      background-color: #1a2f55;
+      color: #333;
+      padding-bottom: 40px;
+    }
+    .navbar { box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+    .card { border-radius: .75rem; box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.1); }
+    .form-control, .form-select { border-radius: 2rem; }
+    .btn { border-radius: 2rem; }
+    .top-buttons a { margin-right: 10px; }
+    .flash-message { max-width: 600px; margin: 20px auto; }
+
+    .card.custom-bg {
+      background-color: #6c757d;
+      color: white;
+    }
+
+    .drivers-table {
+      background-color: #6c757d;
+      color: white;
+    }
+
+    .drivers-table th,
+    .drivers-table td {
+      background-color: #6c757d !important;
+      color: white !important;
+      border-color: #dee2e6;
+      border: 1px solid  #343a40 !important;
+    }
+    .drivers-table th {
+      font-weight: bold;
+    }
+
+    .watermark-logo {
+      position: fixed;
+      top: 55%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      opacity: 0.15;
+      z-index: 1000;
+      pointer-events: none;
+    }
+
+    .watermark-logo img {
+      width: 400px;
+      height: auto;
+    }
+
+    .content-wrapper {
+      position: relative;
+      z-index: 2;
+    }
+
+    .submit-wrapper {
+      text-align: center;
+    }
+
+    .action-buttons {
+      text-align: center;
+    }
+
+    .action-buttons .btn {
+      background-color: #1a2f55;
+      color: white;
+    }
+
+    .action-buttons .btn:hover {
+      background-color: #1f2235;
+    }
+
+    .drivers-table th:last-child {
+      text-align: center;
+    }
+  </style>
+</head>
+
+<body>
+<div class="watermark-logo">
+  <img src="{{ url_for('static', filename='LOGO3.png') }}" alt="Watermark Logo">
+</div>
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-secondary mb-4 text-white">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="#">Admin Panel-Add Driver</a>
+    <div class="collapse navbar-collapse">
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item"><a class="nav-link" href="{{ url_for('admin_dashboard') }}">Dashboard</a></li>
+        <li class="nav-item"><a class="nav-link active" href="{{ url_for('add_driver') }}">Drivers</a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ url_for('logout') }}">Logout</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<div class="container">
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      {% for cat, msg in messages %}
+        <div class="alert alert-{{ cat }} flash-message">{{ msg }}</div>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
+
+  <div class="row gx-4">
+    <div class="col-md-4 mb-4">
+      <div class="card custom-bg">
+        <div class="card-header text-white" style="background-color: #5a6268;">
+          {% if driver_to_edit %}Edit Driver{% else %}Add New Driver{% endif %}
+        </div>
+        <div class="card-body">
+          <form method="POST">
+            <div class="mb-3">
+              <label class="form-label">Registration Number</label>
+              <input class="form-control" name="registration_number"
+                     value="{{ driver_to_edit.registration_number if driver_to_edit else '' }}"
+                     {% if driver_to_edit %}readonly{% endif %} required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Name</label>
+              <input class="form-control" name="name"
+                     value="{{ driver_to_edit.name if driver_to_edit else '' }}" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Email</label>
+              <input type="email" class="form-control" name="email"
+                     value="{{ driver_to_edit.email if driver_to_edit else '' }}" required>
+            </div>
+            <div class="mb-3">
+  <label class="form-label">Password</label>
+  <div class="input-group">
+    <input type="password" class="form-control" name="password" id="pwdField" placeholder="New password (optional)">
+    <button type="button" class="btn btn-outline-light" onclick="togglePassword()">👁️</button>
+  </div>
+</div>
+            <div class="mb-3">
+              <label class="form-label">Working Days</label>
+              <input class="form-control" name="working_days"
+                     value="{{ driver_to_edit.working_days if driver_to_edit else '' }}" placeholder="Mon–Fri">
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Shift</label>
+              <input class="form-control" name="shift"
+                     value="{{ driver_to_edit.shift if driver_to_edit else '' }}" placeholder="Morning">
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Route Code</label>
+              <select class="form-select" name="route_code" required>
+                <option value="">Select Route</option>
+                {% for route in routes %}
+                  <option value="{{ route.route_code }}"
+                    {% if driver_to_edit and driver_to_edit.route_code == route.route_code %}selected{% endif %}>
+                    {{ route.route_code }} ({{ route.start }} → {{ route.end }})
+                  </option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="form-check form-switch mb-3">
+              <input class="form-check-input" type="checkbox" name="is_active" id="activeSwitch"
+                {% if driver_to_edit and driver_to_edit.is_active == 1 %}checked{% endif %}>
+              <label class="form-check-label" for="activeSwitch">Active</label>
+            </div>
+<button type="submit" class="btn w-100 text-white" style="background-color: #1a2f55;">Save Driver</button>
+
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-8">
+      <div class="card custom-bg">
+        <div class="card-header text-white d-flex justify-content-between align-items-center" style="background-color: #5a6268;">
+          <span>All Drivers</span>
+          <form class="d-flex" method="GET" action="{{ url_for('add_driver') }}">
+            <input class="form-control form-control-sm me-2" name="search" placeholder="Search…" value="{{ request.args.get('search','') }}">
+            <button class="btn btn-sm btn-light" type="submit">Go</button>
+          </form>
+        </div>
+        <div class="card-body p-0">
+          <table class="table table-bordered mb-0 drivers-table">
+            <thead>
+              <tr>
+                <th>REG. No.</th>
+                <th>NAME</th>
+                <th>EMAIL</th>
+                <th>DAYS</th>
+                <th>SHIFT</th>
+                <th>ROUTE</th>
+                <th>STATUS</th>
+                <th class="text-center">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for d in drivers %}
+              <tr>
+                <td>{{ d.registration_number }}</td>
+                <td>{{ d.name }}</td>
+                <td>{{ d.email }}</td>
+                <td>{{ d.working_days }}</td>
+                <td>{{ d.shift }}</td>
+                <td>{{ d.route_code }}</td>
+                <td>{{ 'Active' if d.is_active==1 else 'Inactive' }}</td>
+                <td class="action-buttons">
+                  <a href="{{ url_for('add_driver', registration_number=d.registration_number) }}" class="btn btn-sm me-1">Edit</a>
+                  <form method="POST" action="{{ url_for('delete_driver', registration_number=d.registration_number) }}" class="d-inline" onsubmit="return confirm('Delete this driver?');">
+                    <button type="submit" class="btn btn-sm">Delete</button>
+                  </form>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  function togglePassword() {
+    const pwd = document.getElementById('pwdField');
+    pwd.type = pwd.type === 'password' ? 'text' : 'password';
+  }
+</script>
+</body>
+</html>
